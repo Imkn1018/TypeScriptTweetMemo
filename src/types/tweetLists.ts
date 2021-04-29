@@ -1,5 +1,5 @@
 export type tweetList = {
-  id: number;
+  id: string;
   // date: number;
   tweet: string;
   category: string;
