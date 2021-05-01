@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { tweetList } from '../types/tweetLists';
 
 type Props = {
-  id: number;
+  id: string;
   tweetLists: Array<tweetList>;
   onOpen: () => void;
 };

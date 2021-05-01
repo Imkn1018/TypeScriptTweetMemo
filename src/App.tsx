@@ -17,16 +17,16 @@ import { useTweetable } from './hooks/useTweetable';
 import { IsTweetableContext } from './providers/IsTweetable';
 import { TweetProvider } from './providers/IsTweetable';
 
-import {db} from "./firebase"
+import { db } from './firebase';
 
 function App() {
   const [id, setId] = useState(1);
   const [newTweet, setNewTweet] = useState('');
   const [category, setCategory] = useState('');
-  const [fireTweet, setFireTweet] = useState<tweetList>({id: "", tweet: "", category: ""})
+
   const [isTweetable, setIsTweetable] = useState(true);
   // const { isTweetable, setIsTweetable } = useTweetable();
-  const [tweetLists, setTweetLists] = useState<tweetList[]>([]);
+  const [tweetLists, setTweetLists] = useState<tweetList[]>([{id: "", tweet: "" , category:""}]);
 
   const onChangeCategory = (e: React.ChangeEvent<HTMLInputElement>) =>
     setCategory(e.target.value);
@@ -34,14 +34,19 @@ function App() {
     setNewTweet(e.target.value);
   };
 
-
   useEffect(() => {
     // onsnapshotデータベースの変化を取得してくれる
     const unSub = db.collection('tweets').onSnapshot((snapshot) => {
-      setNewTweet(
+      
+      setTweetLists(
         // doc => ドキュメント
-        snapshot.docs.map((doc) => (doc.data().tweet))
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          tweet: doc.data().tweet,
+          category: doc.data().category,
+        }))
       );
+      console.log(tweetLists)
     });
     return () => unSub();
   }, []);
@@ -53,27 +58,35 @@ function App() {
   //   }
   // }, [newTweet ,setNewTweet])
 
-  const onClickTweetAdd = () => {
-    setIsTweetable(true);
-    if (isTweetable) {
-      console.log(isTweetable);
-      setId(id + 1);
-      setTweetLists([
-        ...tweetLists,
-        { id: id, tweet: newTweet, category: category },
-      ]);
-      console.log(tweetLists);
-      setNewTweet('');
-      setCategory('');
-    } else {
-      console.log(isTweetable);
-      alert('hogehoge');
-    }
+  // const onClickTweetAdd = () => {
+  //   setIsTweetable(true);
+  //   if (isTweetable) {
+  //     console.log(isTweetable);
+  //     setId(id + 1);
+  //     setTweetLists([
+  //       ...tweetLists,
+  //       { id: id, tweet: newTweet, category: category },
+  //     ]);
+  //     console.log(tweetLists);
+  //     setNewTweet('');
+  //     setCategory('');
+  //   } else {
+  //     console.log(isTweetable);
+  //     alert('hogehoge');
+  //   }
+  // };
+
+  const onClickFireTweetAdd = () => {
+    db.collection('tweets').add({ tweet: newTweet, category: category });
+    console.log(db.collection('tweets'));
+    setNewTweet('');
+    setCategory('');
   };
 
   return (
     <ChakraProvider>
       <Header></Header>
+
       <Wrap p={{ base: 4, md: 10 }} justify="center">
         <WrapItem>
           <TweetProvider>
@@ -82,7 +95,7 @@ function App() {
               category={category}
               onChangeCategory={onChangeCategory}
               onChangeTweet={onChangeTweet}
-              onClick={onClickTweetAdd}
+              onClick={onClickFireTweetAdd}
             />
           </TweetProvider>
         </WrapItem>

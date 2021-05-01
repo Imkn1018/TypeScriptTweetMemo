@@ -24,7 +24,7 @@ export const TweetIndex: VFC<Props> = memo((props) => {
   const { tweetLists } = props;
   const { onSelectTweet, selectedTweet } = useSelectTweet();
 
-  const onClickSelectTweet = (id: number) =>
+  const onClickSelectTweet = (id: string) =>
     onSelectTweet({ tweetLists, id, onOpen });
   return (
     <>
